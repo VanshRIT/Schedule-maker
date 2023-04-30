@@ -4,7 +4,7 @@ import csv
 num_courses = int(input("Enter the number of courses: "))
 courses = []
 for i in range(num_courses):
-    subject = input("Enter the subject of course {}: ".format(i+1))
+    subject = input("Enter the subject of course {}: ".format(i+1)).upper()
     cat_num = input("Enter the catalog number of course {}: ".format(i+1))
     courses.append((subject, cat_num))
 
@@ -28,17 +28,17 @@ with open('class_schedule.csv', 'r') as csvfile:
 classes.sort(key=lambda x: x[2])
 
 # Create list of sections with no conflicts
-sections = []
+sections = {}
 for c in classes:
-    conflict = False
-    for s in sections:
-        if c[2][0] == s[2][0] and c[2][1] < s[2][2] and c[2][2] > s[2][1]:
-            conflict = True
+    valid_section = True
+    for s in sections.values():
+        if c[0] == s[0] or (c[2][0] == s[2][0] and ((c[2][1] >= s[2][1] and c[2][1] < s[2][2]) or (s[2][1] >= c[2][1] and s[2][1] < c[2][2]))):
+            valid_section = False
             break
-    if not conflict:
-        sections.append(c)
+    if valid_section:
+        sections[c[0]] = c
 
 # Output sections
 print("Best possible schedule:")
-for s in sections:
+for s in sections.values():
     print(s[0], s[1], s[2][0], s[2][1], s[2][2])
