@@ -38,7 +38,7 @@ for c in classes:
     if valid_section:
         sections[c[0]] = c
 
-# Output sections
+# Output section
 print("Best possible schedule:")
 for s in sections.values():
     print(s[0], s[1], s[2][0], s[2][1], s[2][2])
