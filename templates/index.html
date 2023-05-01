@@ -1,15 +1,86 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Class Schedule Maker</title>
-</head>
-<body>
-    <h1>Class Schedule Maker</h1>
-    <form method="POST" action="{{ url_for('index') }}">
-        <label for="num_courses">Number of courses:</label>
-        <input type="number" name="num_courses" id="num_courses" required min="1"><br>
+  <head>
+    <meta charset="UTF-8">
+    <title>Course Schedule</title>
+  </head>
+  <body>
+    <h1>Course Schedule Generator</h1>
+    <form method="POST" action="/schedule">
+      <div id="course-fields">
+        <fieldset>
+          <legend>Course 1</legend>
+          <label for="course1-subject">Subject:</label>
+          <input type="text" id="course1-subject" name="course1-subject" required>
 
-        <input type="submit" value="Next">
+          <label for="course1-catalog-num">Catalog Number:</label>
+          <input type="text" id="course1-catalog-num" name="course1-catalog-num" required>
+
+          <button type="button" class="remove-course-btn">-</button>
+        </fieldset>
+      </div>
+
+      <input type="hidden" name="course-count" id="course-count" value="1">
+
+      <button type="button" id="add-course-btn">+</button>
+      <button type="button" id="remove-course-btn">-</button>
+
+      <button type="submit">Generate Schedule</button>
     </form>
-</body>
+
+    <script>
+      const form = document.querySelector('form');
+      const addBtn = document.querySelector('#add-course-btn');
+      const removeBtn = document.querySelector('#remove-course-btn');
+      const courseFields = document.querySelector('#course-fields');
+      const removeCourseBtn = document.querySelector('.remove-course-btn');
+      const courseCountInput = document.querySelector('#course-count');
+
+      let courseCount = 1;
+
+      addBtn.addEventListener('click', () => {
+        courseCount++;
+        const fieldset = document.createElement('fieldset');
+        fieldset.innerHTML = `
+          <legend>Course ${courseCount}</legend>
+          <label for="course${courseCount}-subject">Subject:</label>
+          <input type="text" id="course${courseCount}-subject" name="course${courseCount}-subject" required>
+
+          <label for="course${courseCount}-catalog-num">Catalog Number:</label>
+          <input type="text" id="course${courseCount}-catalog-num" name="course${courseCount}-catalog-num" required>
+
+          <button type="button" class="remove-course-btn">-</button>
+        `;
+
+        courseFields.appendChild(fieldset);
+
+        removeCourseBtn.addEventListener('click', () => {
+          courseFields.removeChild(fieldset);
+          courseCount--;
+          courseCountInput.value = courseCount;
+          updateCourseCount();
+        });
+
+        courseCountInput.value = courseCount;
+        updateCourseCount();
+      });
+
+      removeBtn.addEventListener('click', () => {
+        const fieldsets = courseFields.querySelectorAll('fieldset');
+        if (fieldsets.length > 1) {
+          courseFields.removeChild(fieldsets[fieldsets.length - 1]);
+          courseCount--;
+          courseCountInput.value = courseCount;
+          updateCourseCount();
+        }
+      });
+
+      function updateCourseCount() {
+        const fieldsets = courseFields.querySelectorAll('fieldset');
+        fieldsets.forEach((fieldset, index) => {
+          fieldset.querySelector('legend').textContent = `Course ${index + 1}`;
+        });
+      }
+    </script>
+  </body>
 </html>
