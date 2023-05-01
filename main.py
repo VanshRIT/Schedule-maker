@@ -1,44 +1,64 @@
 import csv
+import itertools
+from datetime import datetime, time
 
 # Get input from user
 num_courses = int(input("Enter the number of courses: "))
 courses = []
 for i in range(num_courses):
-    subject = input("Enter the subject of course {}: ".format(i+1)).upper()
-    cat_num = input("Enter the catalog number of course {}: ".format(i+1))
+    subject = input("Enter the subject of course {}: ".format(i + 1)).upper()
+    cat_num = input("Enter the catalog number of course {}: ".format(i + 1))
     courses.append((subject, cat_num))
 
 # Parse CSV file and create list of classes
-classes = []
+classes = {}
+
+for course in courses:
+    classes[course] = []
+
 with open('class_schedule.csv', 'r') as csvfile:
     reader = csv.reader(csvfile)
     next(reader)  # skip header row
+
     for row in reader:
         if (row[2], row[3]) in courses:
             course = row[2] + ' ' + row[3]
             section = row[4]
             days = row[10]
-            time_start = row[11]
-            time_end = row[12]
+
+            try:
+                time_start = datetime.strptime(row[11], '%I:%M %p').time().strftime('%H:%M')
+                time_end = datetime.strptime(row[12], '%I:%M %p').time().strftime('%H:%M')
+
+            except:
+                continue
+
             if days and time_start and time_end:
                 time = (days, time_start, time_end)
-                classes.append((course, section, time))
+                classes[(row[2], row[3])].append((course, section, time))
 
-# Sort list of classes by time
-classes.sort(key=lambda x: x[2])
+combos = itertools.product(*classes.values())
+no_clash = []
 
-# Create list of sections with no conflicts
-sections = {}
-for c in classes:
-    valid_section = True
-    for s in sections.values():
-        if c[0] == s[0] or (c[2][0] == s[2][0] and ((c[2][1] >= s[2][1] and c[2][1] < s[2][2]) or (s[2][1] >= c[2][1] and s[2][1] < c[2][2]))):
-            valid_section = False
-            break
-    if valid_section:
-        sections[c[0]] = c
+for combo in combos:
+    clash = False
+    for i, course1 in enumerate(combo):
+        for j, course2 in enumerate(combo):
+            if i != j and (course1[2][0] in course2[2][0] or course1[2][0] in course2[2][0]):
+                if (course1[2][1] <= course2[2][1] < course1[2][2]) or (
+                        course2[2][1] <= course1[2][1] < course2[2][2]) or \
+                        (course1[2][1] <= course2[2][2] < course1[2][2]) or (
+                        course2[2][1] <= course1[2][2] < course2[2][2]) or \
+                        (course2[2][1] <= course1[2][1] and course1[2][2] <= course2[2][2]) or \
+                        (course1[2][1] <= course2[2][1] and course2[2][2] <= course1[2][2]):
+                    clash = True
+
+    if not clash:
+        no_clash.append(combo)
 
 # Output section
 print("Best possible schedule:")
-for s in sections.values():
-    print(s[0], s[1], s[2][0], s[2][1], s[2][2])
+for combo in no_clash:
+    for s in combo:
+        print(s[0], s[1], s[2][0], s[2][1], s[2][2])
+    print("\n\n")

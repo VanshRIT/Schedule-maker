@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Class Schedule</title>
+</head>
+<body>
+    <h1>Class Schedule</h1>
+    {% if error %}
+        <p>{{ error }}</p>
+    {% else %}
+        <p>{{ schedule }}</p>
+    {% endif %}
+    <a href="/">Return to Course Selection</a>
+</body>
+</html>

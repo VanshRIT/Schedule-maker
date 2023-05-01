@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Class Schedule Maker</title>
+</head>
+<body>
+    <h1>Class Schedule Maker</h1>
+    <form method="POST" action="{{ url_for('index') }}">
+        <label for="num_courses">Number of courses:</label>
+        <input type="number" name="num_courses" id="num_courses" required min="1"><br>
+
+        <input type="submit" value="Next">
+    </form>
+</body>
+</html>
