@@ -14,11 +14,10 @@ def index():
 def schedule():
     num_courses = int(request.form['course-count'])
     if "friday" in request.form:
-        wantfriday = False
-
+        want_friday = False
     else:
-        wantfriday = True
-    print(request.form)
+        want_friday = True
+
     courses = []
 
     for i in range(num_courses):
@@ -62,7 +61,7 @@ def schedule():
         not_viable = False
         for i, course1 in enumerate(combo):
             for j, course2 in enumerate(combo):
-                if not wantfriday and ('F' in course1[2] or 'F' in course2[2]):
+                if not want_friday and ('F' in course1[2] or 'F' in course2[2]):
                     not_viable = True
                     break
 
