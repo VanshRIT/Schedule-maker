@@ -13,7 +13,12 @@ def index():
 @app.route('/schedule', methods=['POST'])
 def schedule():
     num_courses = int(request.form['course-count'])
-    friday = False
+    if "friday" in request.form:
+        wantfriday = False
+
+    else:
+        wantfriday = True
+    print(request.form)
     courses = []
     for i in range(num_courses):
         subject = request.form[f'course-{i + 1}-subject'].upper()
@@ -50,7 +55,7 @@ def schedule():
         clash = False
         for i, course1 in enumerate(combo):
             for j, course2 in enumerate(combo):
-                if not friday and ('F' in course1[2][0] or 'F' in course2[2][0]):
+                if not wantfriday and ('F' in course1[2][0] or 'F' in course2[2][0]):
                     clash = True
 
                 if i != j and (course1[2][0] in course2[2][0] or course2[2][0] in course1[2][0]):

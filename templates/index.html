@@ -23,9 +23,12 @@
           <label for="course-1-catalog-num">Catalog Number:</label>
           <input type="text" id="course-1-catalog-num" name="course-1-catalog-num" required>
 
+
+
           <button type="button" class="remove-course-btn">-</button>
         </fieldset>
-      </div>
+
+
 
       <input type="hidden" name="course-count" id="course-count" value="1">
 
@@ -33,9 +36,16 @@
       <button type="button" id="remove-course-btn">-</button>
 
       <button type="submit">Generate Schedule</button>
+
+      <label for="friday">For No Friday Classes</label>
+      <input type="checkbox" name="friday" class="inline checkbox" id="friday" value=1>
+        </div>
     </form>
 
     <script>
+
+
+
       const form = document.querySelector('form');
       const addBtn = document.querySelector('#add-course-btn');
       const removeBtn = document.querySelector('#remove-course-btn');
@@ -88,6 +98,12 @@
           fieldset.querySelector('legend').textContent = `Course ${index + 1}`;
         });
       }
+
+
+      $("#friday").is(':checked', function(){
+              $("#friday").attr('value', 'F');
+          });
+
     </script>
   </body>
 </html>

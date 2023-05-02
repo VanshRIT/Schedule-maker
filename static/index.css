@@ -95,3 +95,40 @@ button:disabled {
   background-color: #c0392b;
 }
 
+
+.checkbox {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.checkbox label {
+  display: inline-block;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox input[type="checkbox"] + label:before {
+  content: "";
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  background-color: #fff;
+}
+
+.checkbox input[type="checkbox"]:checked + label:before {
+  content: "\2713";
+  text-align: center;
+  color: #fff;
+  background-color: #333;
+}
+
+
