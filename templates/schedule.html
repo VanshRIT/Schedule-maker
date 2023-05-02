@@ -10,30 +10,32 @@
     <h1>Course Schedule</h1>
     {% if sections %}
       <table>
-  <thead>
-    <tr>
-      <th>Course</th>
-      <th>Section</th>
-      <th>Days</th>
-      <th>Time</th>
-      <th>Instructor</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for key, value in schedule.items() %}
-      {% for course in value %}
-        <tr>
-          <td>{{ course[0] }}</td>
-          <td>{{ course[1] }}</td>
-          <td>{{ course[2][0] }}</td>
-          <td>{{ course[2][1] }} - {{ course[2][2] }}</td>
-          <td>{{ course[3] }}</td>
-        </tr>
-      {% endfor %}
-    {% endfor %}
-  </tbody>
-</table>
-
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Section</th>
+            <th>Instructor</th>
+            <th>Days</th>
+            <th>Start</th>
+            <th>End</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for combo in sections %}
+            {% for section in combo %}
+              <tr>
+                <td>{{ section[0] }}</td>
+                <td>{{ section[1] }}</td>
+                <td>{{ section[5] }}</td>
+                <td>{{ section[2] }}</td>
+                <td>{{ section[3] }}</td>
+                <td>{{ section[4] }}</td>
+              </tr>
+            {% endfor %}
+            <tr><td colspan="6">&nbsp;</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
     {% else %}
       <p>No sections found that don't conflict</p>
     {% endif %}
