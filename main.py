@@ -52,6 +52,7 @@ def schedule():
             if not conflict:
                 sections.append((course_key, section1))
 
+
     # Render template with list of sections
     return render_template('schedule.html', sections=sections)
 

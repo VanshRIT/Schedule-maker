@@ -1,15 +1,41 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Class Schedule</title>
-</head>
-<body>
-    <h1>Class Schedule</h1>
-    {% if error %}
-        <p>{{ error }}</p>
+  <head>
+    <meta charset="UTF-8">
+    <title>Course Schedule</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  </head>
+  <body>
+    <h1>Course Schedule</h1>
+    {% if sections %}
+      <table>
+  <thead>
+    <tr>
+      <th>Course</th>
+      <th>Section</th>
+      <th>Days</th>
+      <th>Time</th>
+      <th>Instructor</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for key, value in schedule.items() %}
+      {% for course in value %}
+        <tr>
+          <td>{{ course[0] }}</td>
+          <td>{{ course[1] }}</td>
+          <td>{{ course[2][0] }}</td>
+          <td>{{ course[2][1] }} - {{ course[2][2] }}</td>
+          <td>{{ course[3] }}</td>
+        </tr>
+      {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+
     {% else %}
-        <p>{{ schedule }}</p>
+      <p>No sections found that don't conflict</p>
     {% endif %}
-    <a href="/">Return to Course Selection</a>
-</body>
+  </body>
 </html>

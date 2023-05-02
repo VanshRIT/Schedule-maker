@@ -1,0 +1,96 @@
+/* Reset styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body styles */
+body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  background-color: #f8f8f8;
+}
+
+/* Header styles */
+h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+/* Form styles */
+form {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+
+#course-fields {
+  margin-bottom: 2rem;
+}
+
+fieldset {
+  margin-bottom: 1rem;
+  border: none;
+}
+
+legend {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+}
+
+button {
+  display: inline-block;
+  margin-right: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  background-color: #f8f8f8;
+  color: #333;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-course-btn {
+  margin-right: 0.5rem;
+}
+
+.remove-course-btn {
+  background-color: #e74c3c;
+  color: #fff;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.remove-course-btn:hover {
+  background-color: #c0392b;
+}
