@@ -15,17 +15,25 @@ def schedule():
     num_courses = int(request.form['course-count'])
     friday = False
     courses = []
+
     for i in range(num_courses):
         subject = request.form[f'course-{i + 1}-subject'].upper()
         cat_num = request.form[f'course-{i + 1}-catalog-num']
+
+        with open('class_schedule.csv', 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            
+
+
         courses.append((subject, cat_num))
 
     classes = {}
     for course in courses:
-        classes[course] = []
+        classes[' '.join(course)] = []
 
     with open('class_schedule.csv', 'r') as csvfile:
         reader = csv.DictReader(csvfile)
+
         for row in reader:
             if (row['Subject'], row['Cat#']) in courses:
                 course = row['Subject'] + ' ' + row['Cat#']
@@ -40,41 +48,36 @@ def schedule():
                     continue
 
                 if days and time_start and time_end:
-                    time_ = (days, time_start, time_end)
-                    classes[(row['Subject'], row['Cat#'])].append((course, section, time_, instructor))
+                    classes[course].append((course, section, days, time_start, time_end, instructor))
 
     combos = itertools.product(*classes.values())
-    no_clash = []
+    viable_schedules = []
 
     for combo in combos:
-        clash = False
+        not_viable = False
         for i, course1 in enumerate(combo):
             for j, course2 in enumerate(combo):
-                if not friday and ('F' in course1[2][0] or 'F' in course2[2][0]):
-                    clash = True
+                if not friday and ('F' in course1[2] or 'F' in course2[2]):
+                    not_viable = True
+                    break
 
-                if i != j and (course1[2][0] in course2[2][0] or course2[2][0] in course1[2][0]):
-                    if (course1[2][1] <= course2[2][1] < course1[2][2]) or \
-                            (course2[2][1] <= course1[2][1] < course2[2][2]) or \
-                            (course1[2][1] <= course2[2][2] < course1[2][2]) or \
-                            (course2[2][1] <= course1[2][2] < course2[2][2]) or \
-                            (course2[2][1] <= course1[2][1] and course1[2][2] <= course2[2][2]) or \
-                            (course1[2][1] <= course2[2][1] and course2[2][2] <= course1[2][2]):
+                if i != j and (course1[2] in course2[2] or course2[2] in course1[2]):
+                    if (course1[3] <= course2[3] < course1[4]) or \
+                            (course2[3] <= course1[3] < course2[4]) or \
+                            (course1[3] <= course2[4] < course1[4]) or \
+                            (course2[3] <= course1[4] < course2[4]) or \
+                            (course2[3] <= course1[3] and course1[4] <= course2[4]) or \
+                            (course1[3] <= course2[3] and course2[4] <= course1[4]):
                         
-                            clash = True
+                            not_viable = True
+                            break
+            if not_viable:
+                break
                     
+        if not not_viable:
+            viable_schedules.append(combo)
 
-        if not clash:
-            no_clash.append(combo)
-
-    sections = []
-    for combo in no_clash:
-        section_info = []
-        for s in combo:
-            section_info.append((s[0], s[1], s[2][0], s[2][1], s[2][2], s[3]))
-        sections.append(section_info)
-
-    return render_template('schedule.html', sections=sections)
+    return render_template('schedule.html', sections=viable_schedules)
 
 
 if __name__ == "__main__":
