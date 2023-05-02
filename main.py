@@ -1,61 +1,80 @@
 from flask import Flask, render_template, request
-
 import csv
+import itertools
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'test'
 
-
-
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
+
 @app.route('/schedule', methods=['POST'])
 def schedule():
-    course_count = int(request.form['course-count'])
+    num_courses = int(request.form['course-count'])
+    friday = False
     courses = []
-    for i in range(1, course_count + 1):
-        subject = request.form.get(f'course{i}-subject')
-        catalog_num = request.form.get(f'course{i}-catalog-num')
-        if subject and catalog_num:
-            courses.append((subject, catalog_num))
-    # Parse CSV file and create list of classes
+    for i in range(num_courses):
+        subject = request.form[f'course-{i + 1}-subject'].upper()
+        cat_num = request.form[f'course-{i + 1}-catalog-num']
+        courses.append((subject, cat_num))
+
     classes = {}
+    for course in courses:
+        classes[course] = []
+
     with open('class_schedule.csv', 'r') as csvfile:
-        reader = csv.reader(csvfile)
-        next(reader)  # skip header row
+        reader = csv.DictReader(csvfile)
         for row in reader:
-            if (row[2], row[3]) in courses:
-                course_key = row[2] + ' ' + row[3]
-                section = row[4]
-                days = row[10]
-                time_start = row[11]
-                time_end = row[12]
+            if (row['Subject'], row['Cat#']) in courses:
+                course = row['Subject'] + ' ' + row['Cat#']
+                section = row['Sect#']
+                days = row['Days']
+                instructor = row['Instructor']
+
+                try:
+                    time_start = datetime.strptime(row['Time Start'], '%I:%M %p').time().strftime('%H:%M')
+                    time_end = datetime.strptime(row['Time End'], '%I:%M %p').time().strftime('%H:%M')
+                except:
+                    continue
+
                 if days and time_start and time_end:
-                    time = (days, time_start, time_end)
-                    if course_key in classes:
-                        classes[course_key].append((section, time))
-                    else:
-                        classes[course_key] = [(section, time)]
+                    time_ = (days, time_start, time_end)
+                    classes[(row['Subject'], row['Cat#'])].append((course, section, time_, instructor))
 
-    # Create list of sections with no conflicts
+    combos = itertools.product(*classes.values())
+    no_clash = []
+
+    for combo in combos:
+        clash = False
+        for i, course1 in enumerate(combo):
+            for j, course2 in enumerate(combo):
+                if not friday and ('F' in course1[2][0] or 'F' in course2[2][0]):
+                    clash = True
+
+                if i != j and (course1[2][0] in course2[2][0] or course2[2][0] in course1[2][0]):
+                    if (course1[2][1] <= course2[2][1] < course1[2][2]) or \
+                            (course2[2][1] <= course1[2][1] < course2[2][2]) or \
+                            (course1[2][1] <= course2[2][2] < course1[2][2]) or \
+                            (course2[2][1] <= course1[2][2] < course2[2][2]) or \
+                            (course2[2][1] <= course1[2][1] and course1[2][2] <= course2[2][2]) or \
+                            (course1[2][1] <= course2[2][1] and course2[2][2] <= course1[2][2]):
+                        
+                            clash = True
+                    
+
+        if not clash:
+            no_clash.append(combo)
+
     sections = []
-    for course_key, sections_list in classes.items():
-        for section1 in sections_list:
-            conflict = False
-            for section2 in sections:
-                if section1[1][0] == section2[1][0] and section1[1][1] < section2[1][2] and section1[1][2] > section2[1][1]:
-                    conflict = True
-                    break
-            if not conflict:
-                sections.append((course_key, section1))
+    for combo in no_clash:
+        section_info = []
+        for s in combo:
+            section_info.append((s[0], s[1], s[2][0], s[2][1], s[2][2], s[3]))
+        sections.append(section_info)
 
-
-    # Render template with list of sections
     return render_template('schedule.html', sections=sections)
-
 
 
 if __name__ == "__main__":
