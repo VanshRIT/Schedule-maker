@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import csv
 import itertools
-from datetime import datetime, time
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'test'
@@ -39,8 +39,8 @@ def schedule():
                     continue
 
                 if days and time_start and time_end:
-                    time = (days, time_start, time_end)
-                    classes[(row['Subject'], row['Cat#'])].append((course, section, time, instructor))
+                    time_ = (days, time_start, time_end)
+                    classes[(row['Subject'], row['Cat#'])].append((course, section, time_, instructor))
 
     combos = itertools.product(*classes.values())
     no_clash = []
