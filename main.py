@@ -10,6 +10,7 @@ app.config['SECRET_KEY'] = 'test'
 def index():
     return render_template('index.html')
 
+
 @app.route('/schedule', methods=['POST'])
 def schedule():
     num_courses = int(request.form['course-count'])
