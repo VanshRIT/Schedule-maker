@@ -29,7 +29,7 @@ def schedule():
         cat_num = request.form[f'course-{i + 1}-catalog-num']
 
         courses.append((subject, cat_num))
-#FIXME The Classes list is not working
+
     classes = {}
     for course in courses:
         classes[' '.join(course)] = []
@@ -43,8 +43,10 @@ def schedule():
 
     cursor = db.cursor()
     cursor.execute('SELECT * FROM class_schedule')
-
-    for row in cursor.fetchall():
+    # FIXME The cursor executes but response is zero on the page
+    data = cursor.fetchall()
+    print(data)
+    for row in data:
         if (row[1], row[2]) in courses:
             course = row[1] + ' ' + row[2]
             section = row[3]
@@ -88,7 +90,7 @@ def schedule():
 
     db.close()
 
-    return viable_schedules
+    return render_template('schedule.html', sections=viable_schedules)
 
 
 if __name__ == '__main__':
