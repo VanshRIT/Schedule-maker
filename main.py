@@ -1,16 +1,19 @@
 from flask import Flask, render_template, request
-import csv
-import itertools
+import mysql.connector
+import dbconfig
 from datetime import datetime
+import itertools
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'test'
 
-@app.route('/')
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    if request.method == 'POST':
+        sections = schedule()
+        return render_template('schedule.html', sections=sections)
     return render_template('index.html')
-
-
+#TODO Add Sql Compatibility
 @app.route('/schedule', methods=['POST'])
 def schedule():
     num_courses = int(request.form['course-count'])
@@ -25,35 +28,37 @@ def schedule():
         subject = request.form[f'course-{i + 1}-subject'].upper()
         cat_num = request.form[f'course-{i + 1}-catalog-num']
 
-        with open('class_schedule.csv', 'r') as csvfile:
-            reader = csv.DictReader(csvfile)
-            
-
-
         courses.append((subject, cat_num))
-
+#FIXME The Classes list is not working
     classes = {}
     for course in courses:
         classes[' '.join(course)] = []
 
-    with open('class_schedule.csv', 'r') as csvfile:
-        reader = csv.DictReader(csvfile)
+    db = mysql.connector.connect(
+        host=dbconfig.HOST,
+        user=dbconfig.USER,
+        password=dbconfig.PASSWORD,
+        database=dbconfig.DATABASE
+    )
 
-        for row in reader:
-            if (row['Subject'], row['Cat#']) in courses:
-                course = row['Subject'] + ' ' + row['Cat#']
-                section = row['Sect#']
-                days = row['Days']
-                instructor = row['Instructor']
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM class_schedule')
 
-                try:
-                    time_start = datetime.strptime(row['Time Start'], '%I:%M %p').time().strftime('%H:%M')
-                    time_end = datetime.strptime(row['Time End'], '%I:%M %p').time().strftime('%H:%M')
-                except:
-                    continue
+    for row in cursor.fetchall():
+        if (row[1], row[2]) in courses:
+            course = row[1] + ' ' + row[2]
+            section = row[3]
+            days = row[4]
+            instructor = row[5]
 
-                if days and time_start and time_end:
-                    classes[course].append((course, section, days, time_start, time_end, instructor))
+            try:
+                time_start = datetime.strptime(row[6], '%I:%M %p').time().strftime('%H:%M')
+                time_end = datetime.strptime(row[7], '%I:%M %p').time().strftime('%H:%M')
+            except:
+                continue
+
+            if days and time_start and time_end:
+                classes[course].append((course, section, days, time_start, time_end, instructor))
 
     combos = itertools.product(*classes.values())
     viable_schedules = []
@@ -73,17 +78,18 @@ def schedule():
                             (course2[3] <= course1[4] < course2[4]) or \
                             (course2[3] <= course1[3] and course1[4] <= course2[4]) or \
                             (course1[3] <= course2[3] and course2[4] <= course1[4]):
-                        
-                            not_viable = True
-                            break
+                        not_viable = True
+                        break
             if not_viable:
                 break
-                    
+
         if not not_viable:
             viable_schedules.append(combo)
 
-    return render_template('schedule.html', sections=viable_schedules)
+    db.close()
+
+    return viable_schedules
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
