@@ -44,7 +44,7 @@ def schedule():
     cursor = db.cursor()
     cursor.execute('SELECT * FROM class_schedule')
     # FIXME The cursor executes but response is zero on the page
-    data = cursor.fetchall()
+    data = list(cursor.fetchall())
     print(data)
     for row in data:
         if (row[1], row[2]) in courses:
@@ -88,6 +88,7 @@ def schedule():
         if not not_viable:
             viable_schedules.append(combo)
 
+    print(viable_schedules)
     db.close()
 
     return render_template('schedule.html', sections=viable_schedules)
