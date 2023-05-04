@@ -2,3 +2,5 @@
 *.xml
 *.iml
 dbconfig.py
+.idea
+__pycache__
