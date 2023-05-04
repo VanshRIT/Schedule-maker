@@ -13,6 +13,8 @@ def index():
         sections = schedule()
         return render_template('schedule.html', sections=sections)
     return render_template('index.html')
+
+
 @app.route('/schedule', methods=['POST'])
 def schedule():
     num_courses = int(request.form['course-count'])
