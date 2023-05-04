@@ -2,5 +2,5 @@
 
 HOST = "localhost"
 USER = "root"
-PASSWORD = "admin@21"
+PASSWORD = "pranav05"
 DATABASE = "Schedule"

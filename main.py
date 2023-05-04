@@ -13,7 +13,6 @@ def index():
         sections = schedule()
         return render_template('schedule.html', sections=sections)
     return render_template('index.html')
-#TODO Add Sql Compatibility
 @app.route('/schedule', methods=['POST'])
 def schedule():
     num_courses = int(request.form['course-count'])
@@ -42,10 +41,11 @@ def schedule():
     )
 
     cursor = db.cursor()
-    cursor.execute('SELECT * FROM class_schedule')
-    # FIXME The cursor executes but response is zero on the page
+
+    cursor.execute('SELECT class, subject, cat, sect, days, instructor, time_start, time_end FROM class_updated')
+
     data = list(cursor.fetchall())
-    print(data)
+
     for row in data:
         if (row[1], row[2]) in courses:
             course = row[1] + ' ' + row[2]
@@ -56,7 +56,7 @@ def schedule():
             try:
                 time_start = datetime.strptime(row[6], '%I:%M %p').time().strftime('%H:%M')
                 time_end = datetime.strptime(row[7], '%I:%M %p').time().strftime('%H:%M')
-            except:
+            except():
                 continue
 
             if days and time_start and time_end:
@@ -88,7 +88,6 @@ def schedule():
         if not not_viable:
             viable_schedules.append(combo)
 
-    print(viable_schedules)
     db.close()
 
     return render_template('schedule.html', sections=viable_schedules)
