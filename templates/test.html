@@ -1,39 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Input Field with Dropdown</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-  <label for="input_field">Input Field:</label>
-  <input type="text" id="input_field" onkeyup="search()">
-  <div id="dropdown" style="display: none;">
-    <label for="dropdown_options">Dropdown Options:</label>
-    <select id="dropdown_options"></select>
-  </div>
-
-  <script>
-    function search() {
-      var input_value = $('#input_field').val();
-      $.ajax({
-        url: '/search',
-        data: {
-          input_value: input_value
-        },
-        success: function(results) {
-          $('#dropdown_options').empty();
-          if (results.length > 0) {
-            for (var i = 0; i < results.length; i++) {
-              var option = $('<option>').text(results[i]);
-              $('#dropdown_options').append(option);
-            }
-            $('#dropdown').show();
-          } else {
-            $('#dropdown').hide();
-          }
-        }
-      });
-    }
-  </script>
-</body>
-</html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Course Schedule</title>
+    <link rel="stylesheet" href="/static/test.css">
+  </head>
+    <header>
+    <div class="header-logo">
+        <img class="logo" src="/static/logo.png" alt="Logo">
+    </div>
+    <nav>
+        <a class="home" href="/">Home</a>
+    </nav>
+</header>

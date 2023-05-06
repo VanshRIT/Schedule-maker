@@ -1,134 +1,251 @@
 /* Reset styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+	--primary-color: #F76902;
+	--secondary-color: #abb1b6;
+	--background-color: #f8f9fa;
 }
-
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
 /* Body styles */
 body {
-  font-family: Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #333;
-  background-color: #f8f8f8;
+	font-family: Arial, sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+	color: #333;
+	background-color: var(--secondary-color);
 }
-
 /* Header styles */
-h1 {
-  font-size: 2rem;
-  text-align: center;
-  margin: 2rem 0;
+header {
+	display: grid;
+	grid-template-columns: auto 1fr;
 }
-
+h1 {
+	font-size: 2rem;
+	text-align: center;
+	margin: 2rem 0;
+}
 /* Form styles */
 form {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  border: 1px solid #ccc;
-  background-color: #fff;
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 2rem;
+	border: 1px solid #ccc;
+	background-color: #fff;
 }
-
 #course-fields {
-  margin-bottom: 2rem;
+	margin-bottom: 2rem;
 }
-
 fieldset {
-  margin-bottom: 1rem;
-  border: none;
+	margin-bottom: 1rem;
+	border: none;
 }
-
 legend {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+	font-size: 1.2rem;
+	font-weight: bold;
+	margin-bottom: 0.5rem;
 }
-
 label {
-  display: block;
-  margin-bottom: 0.5rem;
+	display: block;
+	margin-bottom: 0.5rem;
+	padding-top: 5px;
 }
-
-input[type="text"] {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 0.25rem;
+select,input[type="text"] {
+	width: 100%;
+	padding: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 0.25rem;
+	background-color: #fff;
+	font-size: 1rem;
+	line-height: 1.5;
+	color: #333;
 }
-
+select:focus,input[type="text"]:focus {
+	outline: none;
+	border-color: #007bff;
+	box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
 button {
-  display: inline-block;
-  margin-right: 0.5rem;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 0.25rem;
-  background-color: #f8f8f8;
-  color: #333;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+	display: inline-block;
+	margin-right: 0.5rem;
+	padding: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 0.25rem;
+	background-color: #f8f8f8;
+	color: #333;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
-
 button:hover {
-  background-color: #333;
-  color: #fff;
+	background-color: #007bff;
+	color: #fff;
 }
-
 button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+	opacity: 0.5;
+	cursor: not-allowed;
 }
-
 .add-course-btn {
-  margin-right: 0.5rem;
+	margin-right: 0.5rem;
 }
-
 .remove-course-btn {
-  background-color: #e74c3c;
-  color: #fff;
-  font-weight: bold;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+	background-color: #e74c3c;
+	color: #fff;
+	font-weight: bold;
+	transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+	margin-top: 10px;
 }
-
 .remove-course-btn:hover {
-  background-color: #c0392b;
+	background-color: #c0392b;
 }
-
-
 .checkbox {
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 0.5rem;
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 0.5rem;
+	outline: 2px solid #1e5180;
+	background: #2b2e2e;
 }
-
 .checkbox label {
-  display: inline-block;
-  margin-bottom: 0;
-  cursor: pointer;
+	display: inline-block;
+	margin: 0.5rem;
+	cursor: pointer;
 }
-
 .checkbox input[type="checkbox"] {
-  display: none;
+	display: none;
 }
-
 .checkbox input[type="checkbox"] + label:before {
-  content: "";
-  display: inline-block;
-  vertical-align: middle;
-  width: 1.2rem;
-  height: 1.2rem;
-  margin-right: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 0.25rem;
-  background-color: #fff;
+	content: "";
+	display: inline-block;
+	vertical-align: middle;
+	width: 1.2rem;
+	height: 1.2rem;
+	margin-right: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 0.25rem;
+	background-color: #fff;
+}
+.checkbox input[type="checkbox"]:checked + label:before {
+	content: "\2713";
+	text-align: center;
+	color: #fff;
+	background-color: #007bff;
+}
+/* Navigation styles */
+nav {
+	background-color: var(--primary-color);
+	color: #fff;
+	padding: 1rem;
+	display: flex;
+	justify-content: flex-end;
+}
+nav a {
+	color: #fff;
+	text-decoration: none;
+}
+nav a:hover {
+	text-decoration: underline;
+}
+nav .home {
+	margin-left: auto;
+}
+.header-logo {
+	max-width: 150px;
+	/* adjust size as needed */
+}
+.logo {
+	max-width: 100%;
+	height: auto;
+	/* adjust opacity as needed */
+}
+.header {
+	overflow: hidden;
+	background-color: var(--primary-color);
+	padding: 20px 10px;
+}
+/* Style the header links */
+.header a {
+	float: left;
+	color: black;
+	text-align: center;
+	padding: 12px;
+	text-decoration: none;
+	font-size: 18px;
+	line-height: 25px;
+	border-radius: 4px;
+	margin-top: 10px;
+}
+/* Style the logo link (notice that we set the same value of line-height and font-size to prevent the header to increase when the font gets bigger */
+.header img.logo {
+	margin-left: 40px;
+}
+/* Change the background color on mouse-over */
+.header a:hover {
+	background-color: var(--secondary-color);
+	color: black;
+}
+/* Style the active/current link*/
+/* Float the link section to the right */
+.header-right {
+	float: right;
+	font-weight: bold;
+}
+select {
+	-webkit-appearance:none;
+	-moz-appearance:none;
+	-ms-appearance:none;
+	appearance:none;
+	outline:0;
+	box-shadow:none;
+	border:0!important;
+	background: #5c6664;
+	background-image: none;
+	flex: 1;
+	padding: 0 .5em;
+	color:#fff;
+	cursor:pointer;
+	font-size: 1em;
+	font-family: 'Open Sans', sans-serif;
+}
+select::-ms-expand {
+	display: none;
+}
+.select {
+	position: relative;
+	display: flex;
+	width: 20em;
+	height: 3em;
+	line-height: 3;
+	background: #5c6664;
+	overflow: hidden;
+	border-radius: .25em;
+}
+.select::after {
+	content: '\25BC';
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 0 1em;
+	background: #2b2e2e;
+	cursor:pointer;
+	pointer-events:none;
+	transition:.25s all ease;
+}
+.select:hover::after {
+	color: #23b499;
+}
+---------------/* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
+@media screen and (max-width: 500px) {
+	.header a {
+		float: none;
+		display: block;
+		text-align: left;
+	}
+	.header-right {
+		float: none;
+	}
 }
 
-.checkbox input[type="checkbox"]:checked + label:before {
-  content: "\2713";
-  text-align: center;
-  color: #fff;
-  background-color: #333;
-}
 
 

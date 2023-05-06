@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <title>Course Schedule</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+      <link rel="stylesheet" href="/static/index.css">
   </head>
-  <header>
-  <nav>
-    <a href="/">Home</a>
-  </nav>
-</header>
+    <div class="header">
+        <img src="/static/logo.png" class="logo" alt="RIT Logo" width="70" height="80">
+    <div class="header-right">
+        <a class="active" href="/">Generate schedule</a>
+
+    </div>
+    </div>
+
+
 
   <body>
     <h1>Course Schedule Generator</h1>
@@ -41,14 +46,20 @@
 
       <input type="hidden" name="course-count" id="course-count" value="1">
 
-      <button type="button" id="add-course-btn">+</button>
+
+
+
+
+
+      </div>
+          <button type="button" id="add-course-btn">+</button>
       <button type="button" id="remove-course-btn">-</button>
+          <label for="friday">For No Friday Classes:
+      <div class="checkbox"></div>
+      <input type="checkbox" name="friday" class="checkbox" id="friday" value=1>
+          </label>
 
-      <button type="submit">Generate Schedule</button>
-
-      <label for="friday">For No Friday Classes</label>
-      <input type="checkbox" name="friday" class="inline checkbox" id="friday" value=1>
-        </div>
+    <button class="submit" type="submit">Generate Schedule</button>
     </form>
 
     <script>
@@ -56,91 +67,91 @@
 
 
         const form = document.querySelector('form');
-        const addBtn = document.querySelector('#add-course-btn');
-        const removeBtn = document.querySelector('#remove-course-btn');
-        const courseFields = document.querySelector('#course-fields');
-        const removeCourseBtn = document.querySelector('.remove-course-btn');
-        const courseCountInput = document.querySelector('#course-count');
+const addBtn = document.querySelector('#add-course-btn');
+const removeBtn = document.querySelector('#remove-course-btn');
+const courseFields = document.querySelector('#course-fields');
+const courseCountInput = document.querySelector('#course-count');
 
-        let courseCount = 1;
+let courseCount = 1;
 
-        addBtn.addEventListener('click', () => {
-          courseCount++;
-          const fieldset = document.createElement('fieldset');
-          fieldset.innerHTML = `
-            <legend>Course-${courseCount}</legend>
-            <label for="course-${courseCount}-course">Course:</label>
-            <select id="course-${courseCount}-course" name="course-${courseCount}-course">
-              <option value="" selected>Select Course</option>
-              {% for course in courses %}
-                <option value="{{ course[0] }}-{{ course[1] }}">{{ course[0] }} {{ course[1] }}</option>
-              {% endfor %}
-            </select>
+addBtn.addEventListener('click', () => {
+  courseCount++;
+  const fieldset = document.createElement('fieldset');
+  fieldset.innerHTML = `
+    <legend>Course-${courseCount}</legend>
+    <label for="course-${courseCount}-course">Course:</label>
+    <select id="course-${courseCount}-course" name="course-${courseCount}-course">
+      <option value="" selected>Select Course</option>
+      {% for course in courses %}
+        <option value="{{ course[0] }}-{{ course[1] }}">{{ course[0] }} {{ course[1] }}</option>
+      {% endfor %}
+    </select>
 
-            <label for="course-${courseCount}-instructor">Instructor:</label>
-            <select id="course-${courseCount}-instructor" name="course-${courseCount}-instructor">
-              <option value="" selected>Select Instructor</option>
-            </select>
+    <label for="course-${courseCount}-instructor">Instructor:</label>
+    <select id="course-${courseCount}-instructor" name="course-${courseCount}-instructor">
+      <option value="" selected>Select Instructor</option>
+    </select>
 
-            <button type="button" class="remove-course-btn">-</button>
-          `;
+    <button type="button" class="remove-course-btn">-</button>
+  `;
 
-          courseFields.appendChild(fieldset);
+  courseFields.appendChild(fieldset);
 
-          removeCourseBtn.addEventListener('click', () => {
-            courseFields.removeChild(fieldset);
-            courseCount--;
-            courseCountInput.value = courseCount;
-            updateCourseCount();
+  const removeCourseBtn = fieldset.querySelector('.remove-course-btn');
+  removeCourseBtn.addEventListener('click', () => {
+    courseFields.removeChild(fieldset);
+    courseCount--;
+    courseCountInput.value = courseCount;
+    updateCourseCount();
+  });
+
+  courseCountInput.value = courseCount;
+  updateCourseCount();
+});
+
+removeBtn.addEventListener('click', () => {
+  const fieldsets = courseFields.querySelectorAll('fieldset');
+  if (fieldsets.length > 1) {
+    courseFields.removeChild(fieldsets[fieldsets.length - 1]);
+    courseCount--;
+    courseCountInput.value = courseCount;
+    updateCourseCount();
+  }
+});
+
+form.addEventListener('change', (event) => {
+  const target = event.target;
+  const idParts = target.id.split('-');
+  const courseNum = idParts[1];
+
+  if (target.name === `course-${courseNum}-course`) {
+    const instructorSelect = document.querySelector(`#course-${courseNum}-instructor`);
+    instructorSelect.innerHTML = '<option value="" selected>Select Instructor</option>';
+
+    const selectedCourse = target.value;
+    if (selectedCourse) {
+      const url = `/instructors?course=${selectedCourse}`;
+      fetch(url)
+        .then(response => response.json())
+        .then(instructors => {
+          instructors.forEach(instructor => {
+            const option = document.createElement('option');
+            option.value = instructor;
+            option.textContent = instructor;
+            instructorSelect.appendChild(option);
           });
+        })
+        .catch(error => console.log(error));
+    }
+  }
+});
 
-          courseCountInput.value = courseCount;
-          updateCourseCount();
-        });
-
-        removeBtn.addEventListener('click', () => {
-          const fieldsets = courseFields.querySelectorAll('fieldset');
-          if (fieldsets.length > 1) {
-            courseFields.removeChild(fieldsets[fieldsets.length - 1]);
-            courseCount--;
-            courseCountInput.value = courseCount;
-            updateCourseCount();
-          }
-        });
-
-        form.addEventListener('change', (event) => {
-          const target = event.target;
-          const idParts = target.id.split('-');
-          const courseNum = idParts[1];
-
-          if (target.name === `course-${courseNum}-course`) {
-            const instructorSelect = document.querySelector(`#course-${courseNum}-instructor`);
-            instructorSelect.innerHTML = '<option value="" selected>Select Instructor</option>';
-
-            const selectedCourse = target.value;
-            if (selectedCourse) {
-              const url = `/instructors?course=${selectedCourse}`;
-              fetch(url)
-                .then(response => response.json())
-                .then(instructors => {
-                  instructors.forEach(instructor => {
-                    const option = document.createElement('option');
-                    option.value = instructor;
-                    option.textContent = instructor;
-                    instructorSelect.appendChild(option);
-                  });
-                })
-                .catch(error => console.log(error));
-            }
-          }
-        });
-
-        function updateCourseCount() {
-          const fieldsets = courseFields.querySelectorAll('fieldset');
-          fieldsets.forEach((fieldset, index) => {
-            fieldset.querySelector('legend').textContent = `Course ${index + 1}`;
-          });
-        }
+function updateCourseCount() {
+  const fieldsets = courseFields.querySelectorAll('fieldset');
+  fieldsets.forEach((fieldset, index) => {
+    fieldset.querySelector('legend').textContent = `Course ${index + 1}`;
+  });
+}
 
 
       $("#friday").is(':checked', function(){
