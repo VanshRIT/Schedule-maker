@@ -120,7 +120,7 @@ def get_viable_schedules(courses: list, want_friday: bool) -> list:
         if not not_viable:
             viable_schedules.append(combo)
 
-        return viable_schedules
+    return viable_schedules
 
 
 if __name__ == '__main__':
