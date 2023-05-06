@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import mysql.connector
 import dbconfig
@@ -146,5 +148,6 @@ def get_viable_schedules(courses: list, want_friday: bool) -> list:
 
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__=="__main__":
+    app.run(host=os.getenv('IP', '0.0.0.0'),
+            port=int(os.getenv('PORT', 4444)))
