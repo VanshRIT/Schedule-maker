@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import mysql.connector
 import dbconfig
 from datetime import datetime
@@ -6,18 +6,46 @@ import itertools
 
 app = Flask(__name__)
 
+db = mysql.connector.connect(
+    host=dbconfig.HOST,
+    user=dbconfig.USER,
+    password=dbconfig.PASSWORD,
+    database=dbconfig.DATABASE
+)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    cursor = db.cursor()
+    cursor.execute('SELECT DISTINCT subject, cat FROM class_updated')
+    courses = cursor.fetchall()
+    db.commit()
+
     if request.method == 'POST':
         sections = schedule()
         return render_template('schedule.html', sections=sections)
-    return render_template('index.html')
 
+    return render_template('index.html', courses=courses)
 
+@app.route('/instructors')
+def instructors():
+    selected_course = request.args.get('course')
+
+    cursor = db.cursor()
+
+    cursor.execute('SELECT DISTINCT instructor FROM class_updated WHERE subject = %s AND cat = %s', selected_course.split('-'))
+
+    data = cursor.fetchall()
+
+    instructors_ = [row[0] for row in data]
+    instructors_.insert(0, "Any")
+    return jsonify(instructors_)
+
+#FIXME Request goes through now, but it shows no viable schedule found always
 @app.route('/schedule', methods=['POST'])
 def schedule():
     num_courses = int(request.form['course-count'])
+
     if "friday" in request.form:
         want_friday = False
     else:
@@ -26,21 +54,23 @@ def schedule():
     courses = []
 
     for i in range(num_courses):
-        subject = request.form[f'course-{i + 1}-subject'].upper()
-        cat_num = request.form[f'course-{i + 1}-catalog-num']
+        subject, cat_num = request.form[f'course-{i + 1}-course'].upper().split('-')
+        instructor = request.form[f'course-{i + 1}-instructor']
 
-        courses.append((subject, cat_num))
+        if instructor == "Any":
+            courses.append((subject, cat_num))
+        else:
+            courses.append((subject, cat_num, instructor))
 
+    viable_schedules = get_viable_schedules(courses, want_friday)
+
+    return render_template('schedule.html', sections=viable_schedules)
+
+
+def get_viable_schedules(courses: list, want_friday: bool) -> list:
     classes = {}
     for course in courses:
-        classes[' '.join(course)] = []
-
-    db = mysql.connector.connect(
-        host=dbconfig.HOST,
-        user=dbconfig.USER,
-        password=dbconfig.PASSWORD,
-        database=dbconfig.DATABASE
-    )
+        classes[(course[0], course[1])] = []
 
     cursor = db.cursor()
 
@@ -49,7 +79,7 @@ def schedule():
     data = list(cursor.fetchall())
 
     for row in data:
-        if (row[1], row[2]) in courses:
+        if ((row[1], row[2]) in courses) or ((row[1], row[2], row[3]) in courses):
             course = row[1] + ' ' + row[2]
             section = row[3]
             days = row[4]
@@ -62,7 +92,7 @@ def schedule():
                 continue
 
             if days and time_start and time_end:
-                classes[course].append((course, section, days, time_start, time_end, instructor))
+                classes[(row[1], row[2])].append((course, section, days, time_start, time_end, instructor))
 
     combos = itertools.product(*classes.values())
     viable_schedules = []
@@ -90,9 +120,7 @@ def schedule():
         if not not_viable:
             viable_schedules.append(combo)
 
-    db.close()
-
-    return render_template('schedule.html', sections=viable_schedules)
+        return viable_schedules
 
 
 if __name__ == '__main__':

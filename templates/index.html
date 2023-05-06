@@ -17,11 +17,20 @@
       <div id="course-fields">
         <fieldset>
           <legend>Course 1</legend>
-          <label for="course-1-subject">Subject:</label>
-          <input type="text" id="course-1-subject" name="course-1-subject" required>
 
-          <label for="course-1-catalog-num">Catalog Number:</label>
-          <input type="text" id="course-1-catalog-num" name="course-1-catalog-num" required>
+        <label for="course-1-course">Course:</label>
+        <select id="course-1-course" name="course-1-course">
+          <option value="" selected>Select Course</option>
+          {% for course in courses %}
+            <option value="{{ course[0] }}-{{ course[1] }}">{{ course[0] }} {{ course[1] }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="course-1-instructor">Instructor:</label>
+        <select id="course-1-instructor" name="course-1-instructor">
+          <option value="" selected>Select Instructor</option>
+        </select>
+
 
 
 
@@ -46,58 +55,92 @@
 
 
 
-      const form = document.querySelector('form');
-      const addBtn = document.querySelector('#add-course-btn');
-      const removeBtn = document.querySelector('#remove-course-btn');
-      const courseFields = document.querySelector('#course-fields');
-      const removeCourseBtn = document.querySelector('.remove-course-btn');
-      const courseCountInput = document.querySelector('#course-count');
+        const form = document.querySelector('form');
+        const addBtn = document.querySelector('#add-course-btn');
+        const removeBtn = document.querySelector('#remove-course-btn');
+        const courseFields = document.querySelector('#course-fields');
+        const removeCourseBtn = document.querySelector('.remove-course-btn');
+        const courseCountInput = document.querySelector('#course-count');
 
-      let courseCount = 1;
+        let courseCount = 1;
 
-      addBtn.addEventListener('click', () => {
-        courseCount++;
-        const fieldset = document.createElement('fieldset');
-        fieldset.innerHTML = `
-          <legend>Course-${courseCount}</legend>
-          <label for="course-${courseCount}-subject">Subject:</label>
-          <input type="text" id="course-${courseCount}-subject" name="course-${courseCount}-subject" required>
+        addBtn.addEventListener('click', () => {
+          courseCount++;
+          const fieldset = document.createElement('fieldset');
+          fieldset.innerHTML = `
+            <legend>Course-${courseCount}</legend>
+            <label for="course-${courseCount}-course">Course:</label>
+            <select id="course-${courseCount}-course" name="course-${courseCount}-course">
+              <option value="" selected>Select Course</option>
+              {% for course in courses %}
+                <option value="{{ course[0] }}-{{ course[1] }}">{{ course[0] }} {{ course[1] }}</option>
+              {% endfor %}
+            </select>
 
-          <label for="course-${courseCount}-catalog-num">Catalog Number:</label>
-          <input type="text" id="course-${courseCount}-catalog-num" name="course-${courseCount}-catalog-num" required>
+            <label for="course-${courseCount}-instructor">Instructor:</label>
+            <select id="course-${courseCount}-instructor" name="course-${courseCount}-instructor">
+              <option value="" selected>Select Instructor</option>
+            </select>
 
-          <button type="button" class="remove-course-btn">-</button>
-        `;
+            <button type="button" class="remove-course-btn">-</button>
+          `;
 
-        courseFields.appendChild(fieldset);
+          courseFields.appendChild(fieldset);
 
-        removeCourseBtn.addEventListener('click', () => {
-          courseFields.removeChild(fieldset);
-          courseCount--;
+          removeCourseBtn.addEventListener('click', () => {
+            courseFields.removeChild(fieldset);
+            courseCount--;
+            courseCountInput.value = courseCount;
+            updateCourseCount();
+          });
+
           courseCountInput.value = courseCount;
           updateCourseCount();
         });
 
-        courseCountInput.value = courseCount;
-        updateCourseCount();
-      });
+        removeBtn.addEventListener('click', () => {
+          const fieldsets = courseFields.querySelectorAll('fieldset');
+          if (fieldsets.length > 1) {
+            courseFields.removeChild(fieldsets[fieldsets.length - 1]);
+            courseCount--;
+            courseCountInput.value = courseCount;
+            updateCourseCount();
+          }
+        });
 
-      removeBtn.addEventListener('click', () => {
-        const fieldsets = courseFields.querySelectorAll('fieldset');
-        if (fieldsets.length > 1) {
-          courseFields.removeChild(fieldsets[fieldsets.length - 1]);
-          courseCount--;
-          courseCountInput.value = courseCount;
-          updateCourseCount();
+        form.addEventListener('change', (event) => {
+          const target = event.target;
+          const idParts = target.id.split('-');
+          const courseNum = idParts[1];
+
+          if (target.name === `course-${courseNum}-course`) {
+            const instructorSelect = document.querySelector(`#course-${courseNum}-instructor`);
+            instructorSelect.innerHTML = '<option value="" selected>Select Instructor</option>';
+
+            const selectedCourse = target.value;
+            if (selectedCourse) {
+              const url = `/instructors?course=${selectedCourse}`;
+              fetch(url)
+                .then(response => response.json())
+                .then(instructors => {
+                  instructors.forEach(instructor => {
+                    const option = document.createElement('option');
+                    option.value = instructor;
+                    option.textContent = instructor;
+                    instructorSelect.appendChild(option);
+                  });
+                })
+                .catch(error => console.log(error));
+            }
+          }
+        });
+
+        function updateCourseCount() {
+          const fieldsets = courseFields.querySelectorAll('fieldset');
+          fieldsets.forEach((fieldset, index) => {
+            fieldset.querySelector('legend').textContent = `Course ${index + 1}`;
+          });
         }
-      });
-
-      function updateCourseCount() {
-        const fieldsets = courseFields.querySelectorAll('fieldset');
-        fieldsets.forEach((fieldset, index) => {
-          fieldset.querySelector('legend').textContent = `Course ${index + 1}`;
-        });
-      }
 
 
       $("#friday").is(':checked', function(){
