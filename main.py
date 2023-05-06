@@ -19,7 +19,7 @@ def index():
     cursor = db.cursor()
     cursor.execute('SELECT DISTINCT subject, cat FROM class_updated')
     courses = cursor.fetchall()
-    db.commit()
+
 
     if request.method == 'POST':
         sections = schedule()
