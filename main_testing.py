@@ -1,6 +1,6 @@
 import mysql.connector
 import dbconfig
-from tabulate import tabulate
+
 
 db = mysql.connector.connect(
     host=dbconfig.HOST,
@@ -10,11 +10,7 @@ db = mysql.connector.connect(
 )
 
 c = db.cursor()
-c.execute('SELECT * FROM class_updated')
+c.execute("SELECT distinct Subject, Cat from class_updated where sect like \"%L%\"")
 data = c.fetchall()
-
-# get the column names from the cursor description
-headers = [col[0] for col in c.description]
-
-# print the data in a tabular format
-print(tabulate(data, headers=headers))
+print(data)
+print(type(data))
