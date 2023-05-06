@@ -27,6 +27,7 @@ def index():
 
     return render_template('index.html', courses=courses)
 
+
 @app.route('/instructors')
 def instructors():
     selected_course = request.args.get('course')
@@ -41,7 +42,7 @@ def instructors():
     instructors_.insert(0, "Any")
     return jsonify(instructors_)
 
-#FIXME Request goes through now, but it shows no viable schedule found always
+
 @app.route('/schedule', methods=['POST'])
 def schedule():
     num_courses = int(request.form['course-count'])
@@ -57,7 +58,7 @@ def schedule():
         subject, cat_num = request.form[f'course-{i + 1}-course'].upper().split('-')
         instructor = request.form[f'course-{i + 1}-instructor']
 
-        if instructor == "Any":
+        if instructor.lower() == "any":
             courses.append((subject, cat_num))
         else:
             courses.append((subject, cat_num, instructor))
@@ -69,35 +70,42 @@ def schedule():
 
 def get_viable_schedules(courses: list, want_friday: bool) -> list:
     classes = {}
+    cursor = db.cursor()
+    print(courses)
     for course in courses:
         classes[(course[0], course[1])] = []
 
-    cursor = db.cursor()
+        if len(course) == 2:
+            cursor.execute(f'SELECT class, subject, cat, sect, days, instructor, time_start, time_end '
+                           f'FROM class_updated WHERE subject="{course[0]}" and cat="{course[1]}"')
+        else:
+            cursor.execute(f'SELECT class, subject, cat, sect, days, instructor, time_start, time_end '
+                           f'FROM class_updated WHERE subject="{course[0]}" and cat="{course[1]}" '
+                           f'and instructor="{course[2]}"')
 
-    cursor.execute('SELECT class, subject, cat, sect, days, instructor, time_start, time_end FROM class_updated')
+        data = list(cursor.fetchall())
+        print(data)
 
-    data = list(cursor.fetchall())
-
-    for row in data:
-        if ((row[1], row[2]) in courses) or ((row[1], row[2], row[3]) in courses):
-            course = row[1] + ' ' + row[2]
+        for row in data:
+            course_name = row[1] + ' ' + row[2]
             section = row[3]
             days = row[4]
             instructor = row[5]
 
-            try:
-                time_start = datetime.strptime(row[6], '%I:%M %p').time().strftime('%H:%M')
-                time_end = datetime.strptime(row[7], '%I:%M %p').time().strftime('%H:%M')
-            except():
+            if row[6] is None or row[7] is None:
                 continue
 
+            time_start = datetime.strptime(row[6], '%I:%M %p').time().strftime('%H:%M')
+            time_end = datetime.strptime(row[7], '%I:%M %p').time().strftime('%H:%M')
+
             if days and time_start and time_end:
-                classes[(row[1], row[2])].append((course, section, days, time_start, time_end, instructor))
+                classes[(course[0], course[1])].append((course_name, section, days, time_start, time_end, instructor))
 
     combos = itertools.product(*classes.values())
     viable_schedules = []
 
     for combo in combos:
+        print(combo)
         not_viable = False
         for i, course1 in enumerate(combo):
             for j, course2 in enumerate(combo):
