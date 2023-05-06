@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import mysql.connector
 import dbconfig
 from datetime import datetime
@@ -142,6 +142,8 @@ def get_viable_schedules(courses: list, want_friday: bool) -> list:
             viable_schedules.append(combo)
 
     return viable_schedules
+
+
 
 
 if __name__ == '__main__':
