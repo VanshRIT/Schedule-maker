@@ -1,5 +1,4 @@
 import requests
-import sqlizer
 import os
 import threading
 import json
@@ -47,8 +46,6 @@ burp0_json = {
         "term": "2231"
     }
 }
-
-sqlizer.config.API_KEY = 'b6jm5dJRgwhTWhCq2uS6PW7ytt6Mu0bJ6UO09XE41UzynBcw86NIX1xGvdXQUEAXZ1IricHtUWh4pcbLIIHgzQ'
 
 if not os.path.exists("SQL"):
     os.makedirs("SQL")
@@ -112,9 +109,7 @@ for i in range(len(class_numbers)):
         result_dict[class_num] = [subject]
 
 
-
 # Print class numbers for debugging
-
 
 # Dictionary mapping subject to filename
 subject_file_mapping = {
@@ -176,6 +171,7 @@ for class_number in class_numbers:
             for result in json_data['searchResults']:
                 if result['classNumber'] == str(class_number):  # Convert class_number to str for comparison
                     enrollment = result['enrollmentTotal']
+                    cap = result["enrollmentCap"]
                     break
 
             # Print enrollment for debugging
@@ -185,6 +181,10 @@ for class_number in class_numbers:
             if enrollment is not None:
                 update_query = "UPDATE class_updated SET enrollment = %s WHERE Class = %s"
                 update_values = (enrollment, class_number)
+                cursor.execute(update_query, update_values)
+
+                update_query = "UPDATE class_updated SET enrollment = %s WHERE Class = %s"
+                update_values = (cap, class_number)
                 cursor.execute(update_query, update_values)
                 db.commit()
                 print(f"Enrollment updated for class number {class_number}: {enrollment}")

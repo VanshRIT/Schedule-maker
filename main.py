@@ -103,10 +103,10 @@ def get_all_combinations(courses, want_friday: bool):
             temp_labs = []
 
         if len(course) == 2:
-            cursor.execute(f'SELECT class, subject, cat, sect, days, instructor, time_start, time_end '
+            cursor.execute(f'SELECT class, subject, cat, sect, days, instructor, time_start, time_end, enrollment, Enr_cap '
                            f'FROM class_updated WHERE subject="{course[0]}" and cat="{course[1]}"')
         else:
-            cursor.execute(f'SELECT class, subject, cat, sect, days, instructor, time_start, time_end '
+            cursor.execute(f'SELECT class, subject, cat, sect, days, instructor, time_start, time_end, enrollment, Enr_cap '
                            f'FROM class_updated WHERE subject="{course[0]}" and cat="{course[1]}" '
                            f'and instructor="{course[2]}"')
 
@@ -117,6 +117,8 @@ def get_all_combinations(courses, want_friday: bool):
             section = row[3]
             days = row[4]
             instructor = row[5]
+            enrollment = row[8]
+            cap = row[9]
 
             if row[6] is None or row[7] is None:
                 continue
@@ -125,20 +127,20 @@ def get_all_combinations(courses, want_friday: bool):
             time_end = datetime.strptime(row[7], '%I:%M %p').time().strftime('%H:%M')
 
             if not (days and time_start and time_end and section):
-                return
+                continue
 
             if has_lab:
                 if "L" in section:
-                    temp_labs.append((course_name, section, days, time_start, time_end, instructor))
+                    temp_labs.append((course_name, section, days, time_start, time_end, instructor, enrollment, cap))
                 else:
-                    temp_sections.append((course_name, section, days, time_start, time_end, instructor))
+                    temp_sections.append((course_name, section, days, time_start, time_end, instructor, enrollment, cap))
 
             else:
-                classes[(course[0], course[1])].append((course_name, section, days, time_start, time_end, instructor))
+                classes[(course[0], course[1])].append((course_name, section, days, time_start, time_end, instructor, enrollment, cap))
 
         if has_lab:
             classes[(course[0], course[1])] = list(itertools.product(temp_labs, temp_sections))
-
+    print(classes)
     return itertools.product(*classes.values())
 
 
@@ -146,6 +148,7 @@ def get_viable_schedules(want_friday: bool, combos) -> list:
     viable_schedules = []
 
     for combo in combos:
+        print(combo)
         not_viable = False
 
         temp_combo = []
@@ -161,18 +164,21 @@ def get_viable_schedules(want_friday: bool, combos) -> list:
         for course in combo:
             if not want_friday and 'F' in course[2]:
                 not_viable = True
-                
                 break
+
+            if course[6] is not None and course[7] is not None and course[6] >= int(course[7]):
+                not_viable = True
+                break
+
         if not_viable:
             continue
-        
+
         not_viable = check_time_clash(combo)
        
         if not not_viable:
             viable_schedules.append(combo)
 
     return viable_schedules
-
 
 
 if __name__=="__main__":
