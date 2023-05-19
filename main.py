@@ -21,6 +21,9 @@ def index():
     cursor = db.cursor()
     cursor.execute('SELECT DISTINCT subject, cat FROM class_updated')
     courses = cursor.fetchall()
+    #fixme The courses shit doesnt work for shit
+
+    #todo x§
 
     if request.method == 'POST':
         sections = schedule()
@@ -172,7 +175,5 @@ def get_viable_schedules(want_friday: bool, combos) -> list:
 
 
 
-
 if __name__=="__main__":
-    app.run(host=os.getenv('IP', '0.0.0.0'),
-            port=int(os.getenv('PORT', 4444)))
+    app.run(debug=True)
