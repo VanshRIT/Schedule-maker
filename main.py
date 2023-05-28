@@ -114,9 +114,11 @@ def get_all_combinations(courses, want_friday: bool):
             instructor = row[5]
             enrollment = row[8]
             cap = row[9]
+            class_no = row[0]
 
             if row[6] is None or row[7] is None:
                 continue
+
 
             time_start = datetime.strptime(row[6], '%I:%M %p').time().strftime('%H:%M')
             time_end = datetime.strptime(row[7], '%I:%M %p').time().strftime('%H:%M')
@@ -126,12 +128,12 @@ def get_all_combinations(courses, want_friday: bool):
 
             if has_lab:
                 if "L" in section:
-                    temp_labs.append((course_name, section, days, time_start, time_end, instructor, enrollment, cap))
+                    temp_labs.append((course_name, section, days, time_start, time_end, instructor, enrollment, cap,class_no))
                 else:
-                    temp_sections.append((course_name, section, days, time_start, time_end, instructor, enrollment, cap))
+                    temp_sections.append((course_name, section, days, time_start, time_end, instructor, enrollment, cap,class_no))
 
             else:
-                classes[(course[0], course[1])].append((course_name, section, days, time_start, time_end, instructor, enrollment, cap))
+                classes[(course[0], course[1])].append((course_name, section, days, time_start, time_end, instructor, enrollment, cap,class_no))
 
         if has_lab:
             classes[(course[0], course[1])] = list(itertools.product(temp_labs, temp_sections))
@@ -141,9 +143,9 @@ def get_all_combinations(courses, want_friday: bool):
 
 def get_viable_schedules(want_friday: bool, combos) -> list:
     viable_schedules = []
-
+    print(combos)
     for combo in combos:
-        print(combo)
+
         not_viable = False
 
         temp_combo = []
@@ -155,6 +157,7 @@ def get_viable_schedules(want_friday: bool, combos) -> list:
                 temp_combo.append(v)
 
         combo = tuple(temp_combo)
+
 
         for course in combo:
             if not want_friday and 'F' in course[2]:

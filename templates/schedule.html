@@ -20,23 +20,33 @@
     <table>
       <thead>
         <tr>
+          <th>Class Number</th>
           <th>Course</th>
           <th>Section</th>
           <th>Instructor</th>
           <th>Days</th>
           <th>Start</th>
           <th>End</th>
+          <th>Enrollment</th>
+          <th>Enrollment Cap</th>
+          <th>Room</th>
+          <th>Zoom</th>
         </tr>
       </thead>
       <tbody>
         {% for section in combo %}
           <tr>
+            <td>{{ section[8] }}</td>
             <td>{{ section[0] }}</td>
             <td>{{ section[1] }}</td>
             <td>{{ section[5] }}</td>
             <td>{{ section[2] }}</td>
             <td>{{ section[3] }}</td>
             <td>{{ section[4] }}</td>
+            <td>{{ section[6] }}</td>
+            <td>{{ section[7] }}</td>
+            <td>TBD</td>
+            <td>In-Person Session</td>
           </tr>
         {% endfor %}
         <tr><td colspan="6">&nbsp;</td></tr>
