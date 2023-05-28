@@ -1,6 +1,8 @@
+# Original Algorithm that was developed to check for time clashes and give a schedule made to work in the console
+
 import csv
 import itertools
-from datetime import datetime, time
+from datetime import datetime
 
 # Get input from user
 num_courses = int(input("Enter the number of courses: "))
@@ -10,12 +12,13 @@ for i in range(num_courses):
     cat_num = input("Enter the catalog number of course {}: ".format(i + 1))
     courses.append((subject, cat_num))
 
-# Parse CSV file and create list of classes
+# Parse CSV file and create dictionary with courses as keys and an empty list as value to segregate sections from CSV
 classes = {}
 
 for course in courses:
     classes[course] = []
 
+# Loops through rows in the CSV and appends each section to their respective lists in the classes dictionary
 with open('class_schedule.csv', 'r') as csvfile:
     reader = csv.reader(csvfile)
     next(reader)  # skip header row
@@ -26,22 +29,25 @@ with open('class_schedule.csv', 'r') as csvfile:
             section = row[4]
             days = row[10]
 
+            # Stores the times as datetime.time objects rather than strings
             try:
                 time_start = datetime.strptime(row[11], '%I:%M %p').time().strftime('%H:%M')
                 time_end = datetime.strptime(row[12], '%I:%M %p').time().strftime('%H:%M')
-
-            except:
+            except AttributeError:
                 continue
 
+            # To make sure they are not empty values
             if days and time_start and time_end:
                 time = (days, time_start, time_end)
                 classes[(row[2], row[3])].append((course, section, time))
 
+# Storing all the possible combinations of sections i.e. schedules in combos
 combos = itertools.product(*classes.values())
 no_clash = []
 
 for combo in combos:
-    clash = False
+    clash = False  # Flag to check if combo is viable or not
+
     for i, course1 in enumerate(combo):
         for j, course2 in enumerate(combo):
             if i != j and (course1[2][0] in course2[2][0] or course1[2][0] in course2[2][0]):

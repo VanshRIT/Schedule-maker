@@ -52,6 +52,7 @@ if not os.path.exists("SQL"):
 if not os.path.exists("Jsons"):
     os.makedirs("Jsons")
 
+
 def export_json(value):
     burp0_json["searchParams"]["query"] = value.strip()
 
@@ -64,8 +65,6 @@ def export_json(value):
         json.dump(obj, file)
 
     print("Data exported to:", json_filename)
-
-
 
 
 # Export JSON files

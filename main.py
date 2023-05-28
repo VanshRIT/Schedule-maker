@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import mysql.connector
 import dbconfig
@@ -19,11 +17,8 @@ db = mysql.connector.connect(
 @app.route('/', methods=['GET', 'POST'])
 def index():
     cursor = db.cursor()
-    cursor.execute('SELECT DISTINCT subject, cat FROM class_updated')
+    cursor.execute('SELECT DISTINCT subject, catalog_number FROM class_updated')
     courses = cursor.fetchall()
-    #fixme The courses shit doesnt work for shit
-
-    #todo x§
 
     if request.method == 'POST':
         sections = schedule()
@@ -38,7 +33,7 @@ def instructors():
 
     cursor = db.cursor()
 
-    cursor.execute('SELECT DISTINCT instructor FROM class_updated WHERE subject = %s AND cat = %s', selected_course.split('-'))
+    cursor.execute('SELECT DISTINCT instructor FROM class_updated WHERE subject = %s AND catalog_number = %s', selected_course.split('-'))
 
     data = cursor.fetchall()
 
@@ -90,7 +85,7 @@ def get_all_combinations(courses, want_friday: bool):
     classes = {}
     classes_with_labs = {}
     cursor = db.cursor()
-    cursor.execute("SELECT distinct Subject, Cat from class_updated where sect like \"%L%\"")
+    cursor.execute("SELECT distinct subject, catalog_number from class_updated where section like \"%L%\"")
     labs_data = cursor.fetchall()
 
     for course in courses:
@@ -103,11 +98,11 @@ def get_all_combinations(courses, want_friday: bool):
             temp_labs = []
 
         if len(course) == 2:
-            cursor.execute(f'SELECT class, subject, cat, sect, days, instructor, time_start, time_end, enrollment, Enr_cap '
-                           f'FROM class_updated WHERE subject="{course[0]}" and cat="{course[1]}"')
+            cursor.execute(f'SELECT class, subject, catalog_number, section, days, instructor, time_start, time_end, enrollment, Enr_cap '
+                           f'FROM class_updated WHERE subject="{course[0]}" and catalog_number="{course[1]}"')
         else:
-            cursor.execute(f'SELECT class, subject, cat, sect, days, instructor, time_start, time_end, enrollment, Enr_cap '
-                           f'FROM class_updated WHERE subject="{course[0]}" and cat="{course[1]}" '
+            cursor.execute(f'SELECT class, subject, catalog_number, section, days, instructor, time_start, time_end, enrollment, Enr_cap '
+                           f'FROM class_updated WHERE subject="{course[0]}" and calalog_number="{course[1]}" '
                            f'and instructor="{course[2]}"')
 
         data = list(cursor.fetchall())
@@ -181,5 +176,5 @@ def get_viable_schedules(want_friday: bool, combos) -> list:
     return viable_schedules
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     app.run(debug=True)
