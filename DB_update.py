@@ -47,8 +47,6 @@ burp0_json = {
     }
 }
 
-if not os.path.exists("SQL"):
-    os.makedirs("SQL")
 if not os.path.exists("Jsons"):
     os.makedirs("Jsons")
 
@@ -90,7 +88,7 @@ db = mysql.connector.connect(
 cursor = db.cursor()
 
 # Retrieve class numbers from the database
-query = "SELECT Class, Subject FROM class_updated"
+query = "SELECT Class_Number, Subject FROM class_updated"
 cursor.execute(query)
 rows = cursor.fetchall()
 
@@ -102,46 +100,61 @@ result_dict = {}
 for i in range(len(class_numbers)):
     class_num = class_numbers[i]
     subject = subjects[i]
-    if class_num in result_dict:
-        result_dict[class_num].append(subject)
-    else:
-        result_dict[class_num] = [subject]
+
+    if class_num is None:
+        continue
+
+    result_dict[class_num] = subject
 
 # Iterate over class numbers
 for class_number in class_numbers:
-    # Find the enrollment for the current class number in JSON data
+    if class_number is None:
+        continue
+
     subject = result_dict.get(class_number)
-    if subject:
-        filename = f"Jsons/{subject[0]}.json"
-        if filename:
-            with open(filename) as file:
-                json_data = json.load(file)
 
-            # Find the enrollment for the current class number in JSON data
-            enrollment = None
-            for result in json_data['searchResults']:
-                if result['classNumber'] == str(class_number):  # Convert class_number to str for comparison
-                    enrollment = result['enrollmentTotal']
-                    cap = result["enrollmentCap"]
-                    break
+    filename = f"Jsons/{subject.strip()}.json"
 
-            # Print enrollment for debugging
+    with open(filename) as file:
+        json_data = json.load(file)
 
+    # Find the enrollment and prereqs for the current class number in JSON data
+    enrollment = None
+    prereqs = []
+    for result in json_data['searchResults']:
+        if result['classNumber'] == str(class_number):  # Convert class_number to str for comparison
+            enrollment = result['enrollmentTotal']
 
-            # Update the enrollment in the database
-            if enrollment is not None:
-                update_query = "UPDATE class_updated SET enrollment = %s WHERE Class = %s"
-                update_values = (enrollment, class_number)
-                cursor.execute(update_query, update_values)
+            if not result["preReqDescrsLong"][0]:
+                break
 
-                db.commit()
-                print(f"Enrollment updated for class number {class_number}: {enrollment}")
-            else:
-                print(f"Enrollment not found for class number {class_number}")
-        else:
-            print(f"Filename not found for subject: {subject[0]}")
+            for word in result["preReqDescrsLong"][0].split():
+                if "-" not in word:
+                    continue
+
+                if word.split("-")[1] and word.split("-")[1][0].isnumeric():
+                    prereqs.append(" ".join(word.split("-")))
+
+    # Update the enrollment in the database
+    if enrollment:
+        update_query = "UPDATE class_updated SET enrollment = %s WHERE Class_Number = %s"
+        update_values = (enrollment, class_number)
+        cursor.execute(update_query, update_values)
+
+        print(f"Enrollment updated for class number {class_number}: {enrollment}")
     else:
-        print(f"Subject not found for class number: {class_number}")
+        print(f"Enrollment not found for class number {class_number}")
+
+    if prereqs:
+        update_query = "UPDATE class_updated SET Prerequisites = %s WHERE Class_Number = %s"
+        update_values = (",".join(prereqs), class_number)
+        cursor.execute(update_query, update_values)
+        print(",".join(prereqs))
+        print(f"Prerequisites updated for class number {class_number}: {enrollment}")
+    else:
+        print(f"Prerequisites not found for class number {class_number}")
+
+    db.commit()
 
 # Close the cursor and connection
 cursor.close()
