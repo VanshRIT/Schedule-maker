@@ -107,60 +107,12 @@ for i in range(len(class_numbers)):
     else:
         result_dict[class_num] = [subject]
 
-
-# Print class numbers for debugging
-
-# Dictionary mapping subject to filename
-subject_file_mapping = {
-    'ACCT': 'Jsons/ACCT.json',
-    'DECS': 'Jsons/DECS.json',
-    'FINC': 'Jsons/FINC.json',
-    'INTB': 'Jsons/INTB.json',
-    'MGIS': 'Jsons/MGIS.json',
-    'SCBI': 'Jsons/SCBI.json',
-    'MGMT': 'Jsons/MGMT.json',
-    'MKTG': 'Jsons/MKTG.json',
-    'EGEN': 'Jsons/EGEN.json',
-    'CMPR': 'Jsons/CMPR.json',
-    'EEEE': 'Jsons/EEEE.json',
-    'ISEE': 'Jsons/ISEE.json',
-    'MECE': 'Jsons/MECE.json',
-    'GCIS': 'Jsons/GCIS.json',
-    'ISTE': 'Jsons/ISTE.json',
-    'NSSA': 'Jsons/NSSA.json',
-    'SWEN': 'Jsons/SWEN.json',
-    'CSEC': 'Jsons/CSEC.json',
-    'CSCI': 'Jsons/CSCI.json',
-    'PUBL': 'Jsons/PUBL.json',
-    'ANTH': 'Jsons/ANTH.json',
-    'COMM': 'Jsons/COMM.json',
-    'ECON': 'Jsons/ECON.json',
-    'ELCA': 'Jsons/ELCA.json',
-    'ENGL': 'Jsons/ENGL.json',
-    'HIST': 'Jsons/HIST.json',
-    'MLAR': 'Jsons/MLAR.json',
-    'MLFR': 'Jsons/MLFR.json',
-    'MLSP': 'Jsons/MLSP.json',
-    'PHIL': 'Jsons/PHIL.json',
-    'PSYC': 'Jsons/PSYC.json',
-    'UWRT': 'Jsons/UWRT.json',
-    'BIOG': 'Jsons/BIOG.json',
-    'BIOL': 'Jsons/BIOL.json',
-    'BIOl': 'Jsons/BIOl.json',
-    'CHMG': 'Jsons/CHMG.json',
-    'MATH': 'Jsons/MATH.json',
-    'PHYS': 'Jsons/PHYS.json',
-    'STAT': 'Jsons/STAT.json',
-    'ACSC': 'Jsons/ACSC.json',
-    'YOPS': 'Jsons/YOPS.json'
-}
-
 # Iterate over class numbers
 for class_number in class_numbers:
     # Find the enrollment for the current class number in JSON data
     subject = result_dict.get(class_number)
     if subject:
-        filename = subject_file_mapping.get(subject[0])
+        filename = f"Jsons/{subject[0]}.json"
         if filename:
             with open(filename) as file:
                 json_data = json.load(file)
