@@ -134,9 +134,6 @@ for class_number in class_numbers:
                 update_values = (enrollment, class_number)
                 cursor.execute(update_query, update_values)
 
-                update_query = "UPDATE class_updated SET enrollment = %s WHERE Class = %s"
-                update_values = (cap, class_number)
-                cursor.execute(update_query, update_values)
                 db.commit()
                 print(f"Enrollment updated for class number {class_number}: {enrollment}")
             else:
